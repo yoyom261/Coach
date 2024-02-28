@@ -1,22 +1,31 @@
 package com.example.coach.controleur;
 
+import com.example.coach.modele.AccesLocal;
+import android.content.Context;
 import com.example.coach.modele.Profil;
+import com.example.coach.outils.Serializer;
+
+import java.util.Date;
 
 public final class Controle {
     private static Controle instance;
     private static Profil profil;
+    private static String nomFic = "saveprofil";
+    private AccesLocal accesLocal;
 
-    public Controle() {
-        super();
+    private Controle(Context context) {
+        //recupSerialize(context);
+        accesLocal = AccesLocal.getInstance(context);
+        profil = accesLocal.recupDernier();
     }
 
     /**
      * Création d'une instance unique de la classe
      * @return l'instance unique
      */
-    public final static Controle getInstance() {
+    public final static Controle getInstance(Context context) {
         if(instance == null){
-            instance = new Controle();
+            instance = new Controle(context);
         }
         return instance;
     }
@@ -28,8 +37,10 @@ public final class Controle {
      * @param age
      * @param sexe 1 pour homme, 0 pour femme
      */
-    public void creerProfil(Integer poids, Integer taille, Integer age, Integer sexe) {
-         profil = new Profil(poids, taille, age, sexe);
+    public void creerProfil(Integer poids, Integer taille, Integer age, Integer sexe, Context context) {
+        profil = new Profil(new Date(), poids, taille, age, sexe);
+        accesLocal.ajout(profil);
+         //Serializer.serialize(nomFic, profil, context);
     }
 
     /**
@@ -56,5 +67,60 @@ public final class Controle {
         }
     }
 
+    /**
+     * Retourne le poids si le profil existe
+     * @return
+     */
+    public Integer getPoids(){
+        if(profil == null){
+            return null;
+        }else{
+            return profil.getPoids();
+        }
+    }
+
+    /**
+     * Retourne la taille si le profil existe
+     * @return
+     */
+    public Integer getTaille(){
+        if(profil == null){
+            return null;
+        }else{
+            return profil.getTaille();
+        }
+    }
+
+    /**
+     * Retourne l'âge si le profil existe
+     * @return
+     */
+    public Integer getAge(){
+        if(profil == null){
+            return null;
+        }else{
+            return profil.getAge();
+        }
+    }
+
+    /**
+     * Retourne le sexe si le profil existe
+     * @return
+     */
+    public Integer getSexe(){
+        if(profil == null){
+            return null;
+        }else{
+            return profil.getSexe();
+        }
+    }
+
+    /**
+     * Récupération du profil sérialisé
+     * @param context
+     */
+    private static void recupSerialize(Context context){
+        profil = (Profil)Serializer.deSerialize(nomFic, context);
+    }
 
 }
